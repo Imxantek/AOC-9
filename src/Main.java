@@ -1,4 +1,5 @@
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Main {
@@ -27,6 +28,32 @@ public class Main {
             }
         }
         return -1;
+    }
+    public static Swap locateSwap3(ArrayList<Integer> list, int windowSize) {
+        int prevNr=list.get(list.size()-1);
+        int currSize=0;
+        for(int i = list.size() - 1; i >= 0; i--) {
+            while(list.get(i)==-1) {
+                i--;
+            }
+            prevNr=list.get(i);
+
+            while(list.get(i)==prevNr) {
+                currSize++;
+                i--;
+            }
+            if(currSize>windowSize) {
+                currSize=0;
+                while(list.get(i)==-1){
+                    i--;
+                }
+                prevNr=list.get(i);
+            }else{
+                return new Swap(i+1,currSize);
+            }
+
+        }
+        return null;
     }
     public static boolean checkSwap(String input) {
         boolean numbers = false;
@@ -101,8 +128,7 @@ public class Main {
         System.out.println(output);
         System.out.println(result);
     }
-    public static void main(String[] args)  {
-        String input=readLine();
+    public static void sol2(String input) {
         ArrayList <Integer> list=new ArrayList<>();
         boolean file=false, space=false;
         for(int i=0; i<input.length(); i++){
@@ -146,5 +172,106 @@ public class Main {
             result+=list.get(i)*i;
         }
         System.out.println(result);
+    }
+    public static void printArray(ArrayList<Integer> list) {
+        for(Integer i: list){
+            if(i==-1){
+                System.out.print(".");
+            }else{
+                System.out.print(i);
+            }
+        }
+        System.out.println();
+    }
+    public static void swap(int leftIndex, int rightIndex, int swapSize, ArrayList<Integer> list) {
+        int valLeft=list.get(leftIndex);
+        int valRight=list.get(rightIndex);
+//        System.out.println("swap attempted");
+        for(int i=0; i<swapSize; i++){
+
+            list.set(leftIndex+i, valRight);
+            list.set(rightIndex+i, valLeft);
+        }
+    }
+    public static void main(String[] args)  {
+        String input=readLine();
+        ArrayList <Integer> list=new ArrayList<>();
+        boolean file=false, space=false;
+        for(int i=0; i<input.length(); i++){
+            if(i%2==0){
+                file=true;
+                space=false;
+            }else{
+                file=false;
+                space=true;
+            }
+            if(file){
+                for(int j=0; j<input.charAt(i)-'0'; j++){
+                    list.add(i/2);
+                }
+            }
+            if(space){
+                for(int j=0; j<input.charAt(i)-'0'; j++){
+                    list.add(-1);
+                }
+            }
+        }
+//        printArray(list);
+//        System.out.println();
+        mainloop:
+        for(int i=list.size()-1; i>=0; i--){
+            while(list.get(i)==-1){
+                i--;
+            }
+            int currNr=list.get(i);
+            int rightSize=0;
+
+            while(list.get(i)==currNr){
+                rightSize++;
+                i--;
+                if(i==0){
+                    break mainloop;
+                }
+            }
+            i++;
+            int rightIndex=i;
+//            System.out.println("rightSize="+rightSize+", rightIndex="+rightIndex+" rightval="+list.get(rightIndex));
+            int leftSize=0;
+            swaploop:
+            for(int j=0; j<list.size()-1; j++){
+                if(list.get(j)!=-1){
+                    leftSize=0;
+                }
+                if(list.get(j)==-1){
+                    int leftIndex=j;
+                    while(list.get(j)==-1){
+                        leftSize++;
+                        if(leftSize>=rightSize && leftIndex<rightIndex){
+//                            System.out.println("leftIndex="+leftIndex+" rightIndex="+rightIndex+" rightSize="+rightSize);
+                            swap(leftIndex, rightIndex, rightSize, list);
+//                            printArray(list);
+                            break swaploop;
+                        }
+                        if(j+1<list.size()-1){
+                            j++;
+                        }else{
+                            break;
+                        }
+                    }
+                    leftSize=0;
+                }
+            }
+//            printArray(list);
+//            System.out.println();
+        }
+        long result=0;
+        for(int i=0; i<list.size(); i++){
+            if(list.get(i)!=-1){
+                result+=list.get(i)*i;
+            }
+        }
+        System.out.println();
+        System.out.println(result);
+
     }
 }
